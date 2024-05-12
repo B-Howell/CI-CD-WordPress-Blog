@@ -129,7 +129,7 @@ resource "aws_db_instance" "blog_mysql_db" {
   allocated_storage      = 5
   engine                 = "mysql"
   engine_version         = "5.7"
-  instance_class         = "db.t2.micro"
+  instance_class         = "db.t3.micro"
   identifier             = "blog"
   db_name                = var.db_name
   username               = var.db_username
