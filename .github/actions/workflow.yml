@@ -1,4 +1,4 @@
-name: Deploy and Configure Infrastructure
+name: Deploy Infrastructure and Configure WordPress
 
 on:
   push:
