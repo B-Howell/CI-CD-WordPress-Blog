@@ -252,8 +252,8 @@ resource "aws_instance" "wordpress_ec2" {
 }
 
 resource "aws_key_pair" "ec2_keypair" {
-  key_name   = "ec2-keypair"
-  public_key = var.public_key
+  key_name   = "mykey"
+  public_key = file("${path.module}/ssh_pub/mykey.pub")
 }
 
 #------------------------ CloudWatch Logs ----------------------------------#

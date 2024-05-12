@@ -12,4 +12,5 @@ cmds
 wordpress_efs_script.sh
 wp-config.php
 
-terraform/.terraform/providers/registry.terraform.io/hashicorp/aws/4.67.0/windows_amd64/terraform-provider-aws_v4.67.0_x5.exe
+mykey
+mykey_base64.txt
