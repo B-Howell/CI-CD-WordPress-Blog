@@ -45,17 +45,6 @@ jobs:
           TF_VAR_db_password: ${{ secrets.DB_PASSWORD }}
           TF_VAR_db_name: ${{ secrets.DB_NAME }}
 
-      - name: Test Output Capture
-        run: |
-          cd terraform
-          IP=$(terraform output -raw ec2_instance_ip)
-          RDS=$(terraform output -raw rds_endpoint)
-          EFS=$(terraform output -raw efs_id)
-          echo "IP: $IP"
-          echo "RDS: $RDS"
-          echo "EFS: $EFS"
-        
-        
       - name: Capture Terraform Outputs
         id: terraform-outputs
         run: |
@@ -63,8 +52,7 @@ jobs:
           echo "ec2_instance_ip=$(terraform output -raw ec2_instance_ip)" >> $GITHUB_ENV
           echo "rds_endpoint=$(terraform output -raw rds_endpoint)" >> $GITHUB_ENV
           echo "efs_id=$(terraform output -raw efs_id)" >> $GITHUB_ENV
-        
-
+          
       - name: Run Ansible
         run: |
           cd ansible
