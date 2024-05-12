@@ -16,6 +16,14 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
+      - name: Generate SSH Key Pair
+        id: generate-ssh-key
+        run: |
+          ssh-keygen -t rsa -b 4096 -m PEM -f ssh_key -N ""
+          echo "::set-output name=public_key::$(cat ssh_key.pub)"
+          echo "::add-mask::$(cat ssh_key)"
+          echo "SSH_PRIVATE_KEY=$(cat ssh_key)" >> $GITHUB_ENV
+
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v2
         with:
@@ -33,6 +41,7 @@ jobs:
           terraform init
           terraform apply -auto-approve
         env:
+          TF_VAR_public_key: ${{ steps.generate-ssh-key.outputs.public_key }}
           TF_VAR_db_username: ${{ secrets.DB_USERNAME }}
           TF_VAR_db_password: ${{ secrets.DB_PASSWORD }}
           TF_VAR_db_name: ${{ secrets.DB_NAME }}
