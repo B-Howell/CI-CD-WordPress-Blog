@@ -52,7 +52,13 @@ jobs:
           echo "ec2_instance_ip=$(terraform output -raw ec2_instance_ip)" >> $GITHUB_ENV
           echo "rds_endpoint=$(terraform output -raw rds_endpoint)" >> $GITHUB_ENV
           echo "efs_id=$(terraform output -raw efs_id)" >> $GITHUB_ENV
-          
+
+      - name: Print Captured Outputs
+        run: |
+          echo "Captured EC2 Instance IP: ${{ env.ec2_instance_ip }}"
+          echo "Captured RDS Endpoint: ${{ env.rds_endpoint }}"
+          echo "Captured EFS ID: ${{ env.efs_id }}"
+
       - name: Run Ansible
         run: |
           cd ansible
