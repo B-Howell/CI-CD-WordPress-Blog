@@ -20,10 +20,11 @@ jobs:
         id: generate-ssh-key
         run: |
           ssh-keygen -t rsa -b 4096 -m PEM -f ssh_key -N ""
-          echo "::set-output name=public_key::$(cat ssh_key.pub)"
-          echo "::add-mask::$(cat ssh_key)"
-          echo "SSH_PRIVATE_KEY=$(cat ssh_key)" >> $GITHUB_ENV
-
+          echo "PUBLIC_KEY=$(cat ssh_key.pub)" >> $GITHUB_ENV
+          echo "SSH_PRIVATE_KEY<<EOF" >> $GITHUB_ENV
+          cat ssh_key >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
+      
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v2
         with:
