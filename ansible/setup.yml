@@ -1,0 +1,96 @@
+---
+- name: Deploy WordPress and MySQL environments on KVM
+  hosts: localhost
+  become: yes
+  vars_files:
+    - vars.yml
+    - secrets.yml
+
+  tasks:
+    - name: Install necessary packages for KVM and VM management
+      apt:
+        name:
+          - qemu-kvm
+          - libvirt-daemon-system
+          - libvirt-clients
+          - bridge-utils
+          - virtinst
+        state: present
+        update_cache: yes
+
+    - name: Define the WordPress VM
+      virt:
+        name: "{{ wp_vm_name }}"
+        state: running
+        memory: 1024
+        vcpus: 1
+        disk:
+          size: 20GB
+        networks:
+          - name: default
+        os_type: linux
+        os_variant: ubuntu20.04
+        virt_type: kvm
+        graphics:
+          type: vnc
+        autostart: yes
+
+    # - name: Define the MySQL VM
+    #   virt:
+    #     name: "{{ db_vm_name }}"
+    #     state: running
+    #     memory: 1024
+    #     vcpus: 1
+    #     disk:
+    #       size: 10GB
+    #     networks:
+    #       - name: default
+    #     os_type: linux
+    #     os_variant: ubuntu20.04
+    #     virt_type: kvm
+    #     graphics:
+    #       type: vnc
+    #     autostart: yes
+
+    # - name: Set up private networking between WordPress and DB VMs
+    #   shell: |
+    #     virsh net-update default add ip-dhcp-host '<host mac="52:54:00:bd:11:22" name="{{ db_vm_name }}" ip="192.168.122.100"/>' --live --config
+    #     virsh net-update default add ip-dhcp-host '<host mac="52:54:00:bd:33:44" name="{{ wp_vm_name }}" ip="192.168.122.101"/>' --live --config
+    #   ignore_errors: yes
+
+    # - name: Restrict network access
+    #   shell: |
+    #     iptables -A INPUT -i virbr0 -p tcp --dport 22 -d 192.168.122.101 -j ACCEPT
+    #     iptables -A INPUT -i virbr0 -p tcp --dport 22 -d 192.168.122.100 -s 192.168.122.101 -j ACCEPT
+    #     iptables -A INPUT -i virbr0 -j DROP
+
+    # - name: Install LAMP stack on WordPress VM
+    #   shell: ssh root@192.168.122.101 'apt-get update && apt-get install apache2 php php-mysql libapache2-mod-php -y && systemctl restart apache2'
+
+    # - name: Install MySQL on Database VM
+    #   shell: ssh root@192.168.122.100 'apt-get update && apt-get install mysql-server -y && mysql_secure_installation'
+
+    # - name: Download and configure WordPress
+    #   shell: ssh root@192.168.122.101 'wget https://wordpress.org/latest.tar.gz -O /tmp/latest.tar.gz && tar -xzf /tmp/latest.tar.gz -C /var/www/html/ && chown -R www-data:www-data /var/www/html/wordpress'
+
+    # - name: Configure WordPress database settings
+    #   shell: ssh root@192.168.122.101 'cp /var/www/html/wordpress/wp-config-sample.php /var/www/html/wordpress/wp-config.php && sed -i "s/database_name_here/wordpress/g" /var/www/html/wordpress/wp-config.php && sed -i "s/username_here/wp_user/g" /var/www/html/wordpress/wp-config.php && sed -i "s/password_here/{{ wp_db_user_password }}/g" /var/www/html/wordpress/wp-config.php && sed -i "s/localhost/192.168.122.100/g" /var/www/html/wordpress/wp-config.php'
+
+    # - name: Schedule backups for WordPress files to NAS
+    #   cron:
+    #     name: "Backup WordPress files"
+    #     minute: "0"
+    #     hour: "2"
+    #     job: "rsync -avz /var/www/html/wordpress/ root@localhost:{{ backup_base_path }}/wp_backups/"
+    #   delegate_to: "{{ wp_vm_name }}"
+    #   become: yes
+
+    # - name: Schedule backups for MySQL database to NAS
+    #   cron:
+    #     name: "Backup MySQL database"
+    #     minute: "30"
+    #     hour: "2"
+    #     job: "ssh root@{{ db_vm_ip }} 'mysqldump -u wp_user -p{{ wp_db_user_password }} wordpress > /tmp/wordpress_db.sql' && rsync -avz /tmp/wordpress_db.sql root@localhost:{{ backup_base_path }}/db_backups/"
+    #   delegate_to: "{{ db_vm_name }}"
+    #   become: yes
+

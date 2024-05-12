@@ -1,0 +1,16 @@
+home-server/
+
+terraform/
+    secrets.tfvars
+    terraform.tfstate
+    terraform.tfstate.backup
+    .terraform.lock.hcl
+    .terraform/
+
+db-stuff
+private-vm
+cmds
+wordpress_efs_script.sh
+wp-config.php
+
+terraform/.terraform/providers/registry.terraform.io/hashicorp/aws/4.67.0/windows_amd64/terraform-provider-aws_v4.67.0_x5.exe
