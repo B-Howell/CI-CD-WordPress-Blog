@@ -18,8 +18,10 @@ jobs:
 
       - name: Setup SSH Key
         run: |
+          mkdir -p ~/.ssh
           echo "${{ secrets.SSH_PRIVATE_KEY_BASE64 }}" | base64 --decode > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
+      
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v2
