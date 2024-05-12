@@ -47,20 +47,22 @@ jobs:
       - name: Test Output Capture
         run: |
           cd terraform
-          echo "EC2 Instance IP: $(terraform output -raw ec2_instance_ip)"
-          echo "RDS Endpoint: $(terraform output -raw rds_endpoint)"
-          echo "EFS ID: $(terraform output -raw efs_id)"
+          IP=$(terraform output -raw ec2_instance_ip)
+          RDS=$(terraform output -raw rds_endpoint)
+          EFS=$(terraform output -raw efs_id)
+          echo "IP: $IP"
+          echo "RDS: $RDS"
+          echo "EFS: $EFS"
+        
         
       - name: Capture Terraform Outputs
         id: terraform-outputs
         run: |
           cd terraform
-          IP=$(terraform output -raw ec2_instance_ip)
-          RDS=$(terraform output -raw rds_endpoint)
-          EFS=$(terraform output -raw efs_id)
-          echo "ec2_instance_ip=${IP%%::*}" >> $GITHUB_ENV
-          echo "rds_endpoint=${RDS%%::*}" >> $GITHUB_ENV
-          echo "efs_id=${EFS%%::*}" >> $GITHUB_ENV
+          echo "ec2_instance_ip=$(terraform output -raw ec2_instance_ip)" >> $GITHUB_ENV
+          echo "rds_endpoint=$(terraform output -raw rds_endpoint)" >> $GITHUB_ENV
+          echo "efs_id=$(terraform output -raw efs_id)" >> $GITHUB_ENV
+        
 
       - name: Run Ansible
         run: |
