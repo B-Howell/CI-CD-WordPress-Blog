@@ -33,6 +33,7 @@ jobs:
         uses: hashicorp/setup-terraform@v2
         with: 
           terraform_version: 1.4.0
+          terraform_wrapper: false
 
       - name: Terraform Init and Apply
         run: |
@@ -59,10 +60,9 @@ jobs:
         id: terraform-outputs
         run: |
           cd terraform
-          echo "ec2_instance_ip=\"$(terraform output -raw ec2_instance_ip)\"" >> $GITHUB_ENV
-          echo "rds_endpoint=\"$(terraform output -raw rds_endpoint)\"" >> $GITHUB_ENV
-          echo "efs_id=\"$(terraform output -raw efs_id)\"" >> $GITHUB_ENV
-        
+          echo "ec2_instance_ip=$(terraform output -raw ec2_instance_ip)" >> $GITHUB_ENV
+          echo "rds_endpoint=$(terraform output -raw rds_endpoint)" >> $GITHUB_ENV
+          echo "efs_id=$(terraform output -raw efs_id)" >> $GITHUB_ENV
         
 
       - name: Run Ansible
