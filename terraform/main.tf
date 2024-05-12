@@ -221,20 +221,6 @@ resource "aws_lb_listener" "blog_listener_http" {
   }
 }
 
-resource "aws_lb_listener" "blog_listener_https" {
-  load_balancer_arn = aws_lb.blog_alb.arn
-  port              = "443"
-  protocol          = "HTTPS"
-  ssl_policy        = "ELBSecurityPolicy-2016-08"
-  certificate_arn   = aws_acm_certificate.blog_cert.arn
-
-  default_action {
-    type             = "forward"
-    target_group_arn = aws_lb_target_group.blog_tg.arn
-  }
-}
-
-
 #---------------------------- EC2 ------------------------------------------#
 
 resource "aws_instance" "wordpress_ec2" {
@@ -261,23 +247,4 @@ resource "aws_key_pair" "ec2_keypair" {
 resource "aws_cloudwatch_log_group" "wordpress_log_group" {
   name              = "/aws/ec2/wordpress"
   retention_in_days = 30
-}
-
-#-------------------------- Route 53 ---------------------------------------#
-
-resource "aws_route53_record" "a_record" {
-  zone_id = data.aws_route53_zone.hosted_zone.zone_id
-  name    = "wp-blog.brettmhowell.com"
-  type    = "A"
-
-  alias {
-    name                   = aws_lb.blog_alb.dns_name
-    zone_id                = aws_lb.blog_alb.zone_id
-    evaluate_target_health = true
-  }
-}
-
-resource "aws_acm_certificate" "blog_cert" {
-  domain_name       = "wp-blog.brettmhowell.com"
-  validation_method = "DNS"
 }
