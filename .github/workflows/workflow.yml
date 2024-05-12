@@ -55,23 +55,13 @@ jobs:
           echo "EFS: $EFS"
         
         
-      - name: Capture and Format Terraform Outputs
+      - name: Capture Terraform Outputs
+        id: terraform-outputs
         run: |
-            cd terraform
-            # Capture outputs
-            IP_RAW=$(terraform output -raw ec2_instance_ip)
-            RDS_RAW=$(terraform output -raw rds_endpoint)
-            EFS_RAW=$(terraform output -raw efs_id)
-            
-            # Remove any characters following '::' to prevent GitHub Actions formatting issues
-            IP="${IP_RAW%%::*}"
-            RDS="${RDS_RAW%%::*}"
-            EFS="${EFS_RAW%%::*}"
-            
-            # Set the environment variables
-            echo "ec2_instance_ip=$IP" >> $GITHUB_ENV
-            echo "rds_endpoint=$RDS" >> $GITHUB_ENV
-            echo "efs_id=$EFS" >> $GITHUB_ENV
+          cd terraform
+          echo "ec2_instance_ip=\"$(terraform output -raw ec2_instance_ip)\"" >> $GITHUB_ENV
+          echo "rds_endpoint=\"$(terraform output -raw rds_endpoint)\"" >> $GITHUB_ENV
+          echo "efs_id=\"$(terraform output -raw efs_id)\"" >> $GITHUB_ENV
         
         
 
