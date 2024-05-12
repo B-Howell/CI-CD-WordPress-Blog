@@ -19,10 +19,13 @@ jobs:
           role-to-assume: ${{ secrets.ROLE_TO_ASSUME }}
 
       - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v1
+        uses: hashicorp/setup-terraform@v2
+        with: 
+          terraform_version: 1.4.0
 
       - name: Terraform Init and Apply
         run: |
+          cd terraform
           terraform init
           terraform apply -auto-approve
         env:
@@ -33,12 +36,15 @@ jobs:
       - name: Capture Terraform Outputs
         id: terraform-outputs
         run: |
+          cd terraform
           echo "::set-output name=ec2_instance_ip::$(terraform output -raw ec2_instance_ip)"
           echo "::set-output name=rds_endpoint::$(terraform output -raw rds_endpoint)"
           echo "::set-output name=efs_id::$(terraform output -raw efs_id)"
 
       - name: Run Ansible
-        run: ansible-playbook -i inventory playbook.yml
+        run: |
+          cd ansible
+          ansible-playbook -i inventory.ini setup.yml
         env:
           DB_NAME: ${{ secrets.DB_NAME }}
           DB_USER: ${{ secrets.DB_USERNAME }}
@@ -46,3 +52,4 @@ jobs:
           EC2_INSTANCE_IP: ${{ steps.terraform-outputs.outputs.ec2_instance_ip }}
           RDS_ENDPOINT: ${{ steps.terraform-outputs.outputs.rds_endpoint }}
           EFS_ID: ${{ steps.terraform-outputs.outputs.efs_id }}
+          AWS_REDION: ${{ secrets.AWS_REGION }}

@@ -1,3 +1,0 @@
-wp_vm_name: wordpress_vm
-db_vm_name: database_vm
-backup_base_path: /mnt/nas  # Base path for backups on the host machine
