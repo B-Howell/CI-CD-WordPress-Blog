@@ -5,6 +5,10 @@ on:
     branches:
       - master
 
+permissions:
+  id-token: write
+  contents: read
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -52,4 +56,4 @@ jobs:
           EC2_INSTANCE_IP: ${{ steps.terraform-outputs.outputs.ec2_instance_ip }}
           RDS_ENDPOINT: ${{ steps.terraform-outputs.outputs.rds_endpoint }}
           EFS_ID: ${{ steps.terraform-outputs.outputs.efs_id }}
-          AWS_REDION: ${{ secrets.AWS_REGION }}
+          AWS_REGION: ${{ secrets.AWS_REGION }}
