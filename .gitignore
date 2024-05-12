@@ -1,11 +1,10 @@
 home-server/
 
-terraform/
-    secrets.tfvars
-    terraform.tfstate
-    terraform.tfstate.backup
-    .terraform.lock.hcl
-    .terraform/
+secrets.tfvars
+terraform.tfstate
+terraform.tfstate.backup
+.terraform.lock.hcl
+.terraform/
 
 db-stuff
 private-vm
