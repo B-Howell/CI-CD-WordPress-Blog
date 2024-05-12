@@ -44,6 +44,13 @@ jobs:
           TF_VAR_db_password: ${{ secrets.DB_PASSWORD }}
           TF_VAR_db_name: ${{ secrets.DB_NAME }}
 
+      - name: Test Output Capture
+        run: |
+          cd terraform
+          echo "EC2 Instance IP: $(terraform output -raw ec2_instance_ip)"
+          echo "RDS Endpoint: $(terraform output -raw rds_endpoint)"
+          echo "EFS ID: $(terraform output -raw efs_id)"
+        
       - name: Capture Terraform Outputs
         id: terraform-outputs
         run: |
