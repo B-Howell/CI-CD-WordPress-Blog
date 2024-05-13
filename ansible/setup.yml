@@ -55,12 +55,12 @@
 
     - name: Debug EFS ID
       debug:
-        msg: "Mounting EFS with ID {{ efs_id }}"
+        msg: "Mounting EFS with ID {{ EFS_ID }}"
 
     - name: Mount the EFS file system
       become: yes
       shell: |
-        sudo mount -t efs -o tls {{ efs_id }} /var/www/html/wordpress/wp-content
+        sudo mount -t efs -o tls {{ EFS_ID }} /var/www/html/wordpress/wp-content
       args:
         executable: /bin/bash
 
