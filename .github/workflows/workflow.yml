@@ -21,7 +21,6 @@ jobs:
           mkdir -p ~/.ssh
           echo "${{ secrets.SSH_PRIVATE_KEY_BASE64 }}" | base64 --decode > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
-      
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v2
@@ -59,16 +58,22 @@ jobs:
           echo "Captured RDS Endpoint: ${{ env.rds_endpoint }}"
           echo "Captured EFS ID: ${{ env.efs_id }}"
 
-      - name: Run Ansible
+      - name: Prepare Ansible Inventory
+        run: |
+          echo "[webserver]" > ansible/inventory.ini
+          echo "ec2-instance ansible_host=${{ env.ec2_instance_ip }} ansible_user=ec2-user ansible_ssh_private_key_file=~/.ssh/id_rsa" >> ansible/inventory.ini
+          echo "[webserver:vars]" >> ansible/inventory.ini
+          echo "ansible_python_interpreter=/usr/bin/python3" >> ansible/inventory.ini
+        
+      - name: Run Ansible Playbook
         run: |
           cd ansible
-          ansible-playbook -i inventory.ini setup.yml --private-key ~/.ssh/id_rsa
+          ansible-playbook -i inventory.ini setup.yml
         env:
-          ANSIBLE_HOST_KEY_CHECKING: False
-          DB_NAME: ${{ secrets.DB_NAME }}
-          DB_USER: ${{ secrets.DB_USERNAME }}
-          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
           EC2_INSTANCE_IP: ${{ env.ec2_instance_ip }}
-          RDS_ENDPOINT: ${{ env.rds_endpoint }}
-          EFS_ID: ${{ env.efs_id }}
-          AWS_REGION: ${{ secrets.AWS_REGION }}
+          DB_NAME: ${{ env.DB_NAME }}
+          DB_USER: ${{ env.DB_USER }}
+          DB_PASSWORD: ${{ env.DB_PASSWORD }}
+          RDS_ENDPOINT: ${{ env.RDS_ENDPOINT }}
+          EFS_ID: ${{ env.EFS_ID }}
+          AWS_REGION: ${{ env.AWS_REGION }}
