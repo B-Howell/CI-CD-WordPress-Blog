@@ -1,0 +1,38 @@
+name: Destroy Infrastructure
+
+on:
+  workflow_dispatch:  # This allows manual trigger from GitHub UI
+
+jobs:
+  destroy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v2
+      with:
+        aws-region: ${{ secrets.AWS_REGION }}
+        role-to-assume: ${{ secrets.ROLE_TO_ASSUME }}
+
+    - name: Setup Terraform
+      uses: hashicorp/setup-terraform@v2
+      with: 
+        terraform_version: "1.4.0"
+        terraform_wrapper: false  # Optional, based on your preference
+
+    - name: Terraform Init
+      run: |
+        cd terraform
+        terraform init
+
+    - name: Terraform Destroy
+      run: |
+        cd terraform
+        terraform destroy -auto-approve
+      env:
+        TF_VAR_db_username: ${{ secrets.DB_USERNAME }}
+        TF_VAR_db_password: ${{ secrets.DB_PASSWORD }}
+        TF_VAR_db_name: ${{ secrets.DB_NAME }}
