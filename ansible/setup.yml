@@ -17,7 +17,19 @@
           - php
           - php-mysqlnd
           - mysql
+          - amazon-efs-utils  # Adding the Amazon EFS utilities installation here
         state: present
+
+    - name: Install Botocore
+      pip:
+        name: botocore
+        state: present
+
+    - name: Create a directory for mounting EFS
+      file:
+        path: /var/www/html/wordpress/wp-content  # Adjust this if you decide to mount directly to /mnt/efs as in your script
+        state: directory
+        mode: '0755'
 
     - name: Download WordPress
       get_url:
@@ -34,7 +46,6 @@
       template:
         src: templates/wp-config.php.j2
         dest: /var/www/html/wordpress/wp-config.php
-      become: yes
 
     - name: Ensure Apache is running and enabled
       service:
@@ -42,10 +53,8 @@
         state: started
         enabled: yes
 
-    - name: Mount EFS
-      mount:
-        path: "/var/www/html/wordpress/wp-content"
-        src: "{{ efs_id }}.efs.{{ aws_region }}.amazonaws.com:/"
-        opts: "nfsvers=4.1,rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2"
-        fstype: "nfs"
-        state: mounted
+    - name: Mount the EFS file system
+      shell: |
+        mount -t efs -o tls {{ efs_id }} /var/www/html/wordpress/wp-content
+      args:
+        executable: /bin/bash
