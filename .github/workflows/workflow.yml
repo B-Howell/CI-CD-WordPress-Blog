@@ -16,12 +16,6 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Setup SSH Key
-        run: |
-          mkdir -p ~/.ssh
-          echo "${{ secrets.SSH_PRIVATE_KEY_BASE64 }}" | base64 --decode > ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
-
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v2
         with:
@@ -58,18 +52,29 @@ jobs:
           echo "Captured RDS Endpoint: ${{ env.rds_endpoint }}"
           echo "Captured EFS ID: ${{ env.efs_id }}"
 
+      - name: Setup SSH Key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY_BASE64 }}" | base64 --decode > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+  
       - name: Prepare Ansible Inventory
         run: |
           echo "[webserver]" > ansible/inventory.ini
           echo "ec2-instance ansible_host=${{ env.ec2_instance_ip }} ansible_user=ec2-user ansible_ssh_private_key_file=~/.ssh/id_rsa" >> ansible/inventory.ini
           echo "[webserver:vars]" >> ansible/inventory.ini
           echo "ansible_python_interpreter=/usr/bin/python3" >> ansible/inventory.ini
-        
+  
+      - name: Add EC2 host key to known_hosts
+        run: |
+          ssh-keyscan -H ${{ env.ec2_instance_ip }} >> ~/.ssh/known_hosts
+  
       - name: Run Ansible Playbook
         run: |
           cd ansible
           ansible-playbook -i inventory.ini setup.yml
         env:
+          ANSIBLE_HOST_KEY_CHECKING: False
           EC2_INSTANCE_IP: ${{ env.ec2_instance_ip }}
           DB_NAME: ${{ env.DB_NAME }}
           DB_USER: ${{ env.DB_USER }}
