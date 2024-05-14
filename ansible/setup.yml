@@ -9,6 +9,7 @@
     rds_endpoint: "{{ lookup('env', 'RDS_ENDPOINT') }}"
     efs_id: "{{ lookup('env', 'EFS_ID') }}"
     aws_region: "{{ lookup('env', 'AWS_REGION') }}"
+    efs_mount_point: /mnt/efs  # Define the mount point for the EFS
   tasks:
     - name: Install necessary packages
       yum:
@@ -25,12 +26,6 @@
         name: botocore
         state: present
 
-    - name: Create a directory for mounting EFS
-      file:
-        path: /var/www/html/wordpress/wp-content  # Adjust this if you decide to mount directly to /mnt/efs as in your script
-        state: directory
-        mode: '0755'
-
     - name: Download WordPress
       get_url:
         url: https://wordpress.org/latest.tar.gz
@@ -42,6 +37,19 @@
         dest: /var/www/html/
         remote_src: yes
 
+    - name: Create EFS mount point directory
+      file:
+        path: "{{ efs_mount_point }}"
+        state: directory
+        owner: root
+        group: root
+        mode: '0755'
+
+    - name: Mount EFS
+      command: "mount -t efs -o tls {{ efs_id }}:/ {{ efs_mount_point }}"
+      args:
+        creates: "{{ efs_mount_point }}/lost+found"  # Check if already mounted
+
     - name: Configure WordPress
       template:
         src: templates/wp-config.php.j2
@@ -52,16 +60,3 @@
         name: httpd
         state: started
         enabled: yes
-
-    - name: Debug EFS ID
-      debug:
-        msg: "Mounting EFS with ID {{ EFS_ID }}"
-
-    - name: Mount the EFS file system
-      become: yes
-      shell: |
-        sudo mount -t efs -o tls {{ EFS_ID }} /var/www/html/wordpress/wp-content
-      args:
-        executable: /bin/bash
-
-
