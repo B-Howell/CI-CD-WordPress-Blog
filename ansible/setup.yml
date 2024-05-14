@@ -9,6 +9,7 @@
     rds_endpoint: "{{ lookup('env', 'RDS_ENDPOINT') }}"
     efs_id: "{{ lookup('env', 'EFS_ID') }}"
     aws_region: "{{ lookup('env', 'AWS_REGION') }}"
+    ec2_instance_az: "{{ lookup('env', 'EC2_INSTANCE_AZ') }}"
     efs_mount_point: /mnt/efs  # Define the mount point for the EFS
   tasks:
     - name: Install Amazon EFS Utilities
@@ -30,6 +31,6 @@
         state: present
 
     - name: Mount the EFS file system
-      command: "mount -t efs -o tls,az=us-east-1f {{ efs_id }} {{ efs_mount_point }}"
+      command: "mount -t efs -o tls,az={{ ec2_instance_az }} {{ efs_id }}:/ {{ efs_mount_point }}"
       args:
         creates: "{{ efs_mount_point }}/lost+found"  # Only run if not already mounted

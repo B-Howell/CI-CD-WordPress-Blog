@@ -44,12 +44,14 @@ jobs:
         run: |
           cd terraform
           echo "EC2_INSTANCE_IP=$(terraform output -raw ec2_instance_ip)" >> $GITHUB_ENV
+          echo "EC2_INSTANCE_AZ=$(terraform output -raw ec2_instance_az)" >> $GITHUB_ENV
           echo "RDS_ENDPOINT=$(terraform output -raw rds_endpoint)" >> $GITHUB_ENV
           echo "EFS_ID=$(terraform output -raw efs_id)" >> $GITHUB_ENV
 
       - name: Print Captured Outputs
         run: |
           echo "Captured EC2 Instance IP: ${{ env.EC2_INSTANCE_IP }}"
+          echo "Captured EC2 Instance AZ: ${{ env.EC2_INSTANCE_AZ }}"
           echo "Captured RDS Endpoint: ${{ env.RDS_ENDPOINT }}"
           echo "Captured EFS ID: ${{ env.EFS_ID }}"
 
@@ -85,6 +87,7 @@ jobs:
         env:
           ANSIBLE_HOST_KEY_CHECKING: False
           EC2_INSTANCE_IP: ${{ env.EC2_INSTANCE_IP }}
+          EC2_INSTANCE_AZ: ${{ env.EC2_INSTANCE_AZ }}
           DB_NAME: ${{ env.DB_NAME }}
           DB_USER: ${{ env.DB_USER }}
           DB_PASSWORD: ${{ env.DB_PASSWORD }}
