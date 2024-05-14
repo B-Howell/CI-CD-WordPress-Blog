@@ -17,14 +17,20 @@
           - httpd
           - php
           - php-mysqlnd
-          - mysql
-          - amazon-efs-utils  # Adding the Amazon EFS utilities installation here
+          - mysql-server
+          - amazon-efs-utils
         state: present
 
     - name: Install Botocore
       pip:
         name: botocore
         state: present
+
+    - name: Start and enable MySQL
+      service:
+        name: mysqld
+        state: started
+        enabled: yes
 
     - name: Download WordPress
       get_url:
@@ -48,7 +54,16 @@
     - name: Mount EFS
       command: "mount -t efs -o tls {{ efs_id }}:/ {{ efs_mount_point }}"
       args:
-        creates: "{{ efs_mount_point }}/lost+found"  # Check if already mounted
+        creates: "{{ efs_mount_point }}/lost+found"
+
+    - name: Move wp-content to EFS
+      command: "mv /var/www/html/wordpress/wp-content {{ efs_mount_point }}/"
+
+    - name: Create symlink for wp-content
+      file:
+        src: "{{ efs_mount_point }}/wp-content"
+        dest: /var/www/html/wordpress/wp-content
+        state: link
 
     - name: Configure WordPress
       template:
@@ -60,3 +75,7 @@
         name: httpd
         state: started
         enabled: yes
+
+    - name: Debug EFS ID
+      debug:
+        msg: "Mounting EFS with ID {{ efs_id }}"
