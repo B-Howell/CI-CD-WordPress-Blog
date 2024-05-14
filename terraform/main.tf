@@ -245,7 +245,7 @@ resource "aws_instance" "wordpress_ec2" {
 }
 
 resource "aws_key_pair" "ec2_keypair" {
-  key_name   = "mykey"
+  key_name   = "blog-key"
   public_key = file("${path.module}/ssh-pub/mykey.pub")
 }
 
