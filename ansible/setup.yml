@@ -11,39 +11,12 @@
     aws_region: "{{ lookup('env', 'AWS_REGION') }}"
     efs_mount_point: /mnt/efs  # Define the mount point for the EFS
   tasks:
-    - name: Install necessary packages
+    - name: Install Amazon EFS Utilities
       yum:
-        name:
-          - httpd
-          - php
-          - php-mysqlnd
-          - mysql-server
-          - amazon-efs-utils
+        name: amazon-efs-utils
         state: present
 
-    - name: Install Botocore
-      pip:
-        name: botocore
-        state: present
-
-    - name: Start and enable MySQL
-      service:
-        name: mysqld
-        state: started
-        enabled: yes
-
-    - name: Download WordPress
-      get_url:
-        url: https://wordpress.org/latest.tar.gz
-        dest: /tmp/wordpress.tar.gz
-
-    - name: Extract WordPress
-      unarchive:
-        src: /tmp/wordpress.tar.gz
-        dest: /var/www/html/
-        remote_src: yes
-
-    - name: Create EFS mount point directory
+    - name: Create a directory for mounting EFS
       file:
         path: "{{ efs_mount_point }}"
         state: directory
@@ -51,31 +24,12 @@
         group: root
         mode: '0755'
 
-    - name: Mount EFS
-      command: "mount -t efs -o tls {{ efs_id }}:/ {{ efs_mount_point }}"
+    - name: Install Botocore
+      pip:
+        name: botocore
+        state: present
+
+    - name: Mount the EFS file system
+      command: "mount -t efs -o tls,az=us-east-1f {{ efs_id }} {{ efs_mount_point }}"
       args:
-        creates: "{{ efs_mount_point }}/lost+found"
-
-    - name: Move wp-content to EFS
-      command: "mv /var/www/html/wordpress/wp-content {{ efs_mount_point }}/"
-
-    - name: Create symlink for wp-content
-      file:
-        src: "{{ efs_mount_point }}/wp-content"
-        dest: /var/www/html/wordpress/wp-content
-        state: link
-
-    - name: Configure WordPress
-      template:
-        src: templates/wp-config.php.j2
-        dest: /var/www/html/wordpress/wp-config.php
-
-    - name: Ensure Apache is running and enabled
-      service:
-        name: httpd
-        state: started
-        enabled: yes
-
-    - name: Debug EFS ID
-      debug:
-        msg: "Mounting EFS with ID {{ efs_id }}"
+        creates: "{{ efs_mount_point }}/lost+found"  # Only run if not already mounted
