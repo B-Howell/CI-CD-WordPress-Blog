@@ -1,6 +1,7 @@
 name: Deploy Infrastructure and Configure WordPress
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - master
