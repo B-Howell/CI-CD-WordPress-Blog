@@ -97,3 +97,26 @@
       template:
         src: templates/wp-config.php.j2
         dest: "{{ efs_mount_point }}/wordpress/wp-config.php"
+
+    - name: Update Apache DocumentRoot
+      lineinfile:
+        path: /etc/httpd/conf/httpd.conf
+        regexp: '^DocumentRoot'
+        line: 'DocumentRoot "{{ efs_mount_point }}/wordpress"'
+        state: present
+
+    - name: Update Apache Directory settings
+      blockinfile:
+        path: /etc/httpd/conf/httpd.conf
+        marker: "# {mark} ANSIBLE MANAGED BLOCK"
+        block: |
+          <Directory "{{ efs_mount_point }}/wordpress">
+            Options Indexes FollowSymLinks
+            AllowOverride All
+            Require all granted
+          </Directory>
+
+    - name: Restart Apache to apply new DocumentRoot
+      service:
+        name: httpd
+        state: restarted
