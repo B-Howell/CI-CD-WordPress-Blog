@@ -51,12 +51,11 @@
         state: started
         enabled: yes
 
-    - name: Install PHP and extensions
-      yum:
-        name: 
-          - php
-          - php-xml
-        state: present
+    - name: Install PHP 7.4 and extensions
+      shell: |
+        amazon-linux-extras enable php7.4
+        yum clean metadata
+        yum install -y php php-common php-xml php-mysqlnd php-json php-cli php-gd php-mbstring php-opcache
 
     - name: Create phpinfo.php for verification
       copy:
