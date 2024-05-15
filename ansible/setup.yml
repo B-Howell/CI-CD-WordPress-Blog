@@ -86,20 +86,12 @@
         group: ec2-user
         mode: '0755'
 
-    - name: Extract WordPress
+    - name: Extract WordPress directly to EFS
       unarchive:
         src: /tmp/wordpress.tar.gz
         dest: "{{ efs_mount_point }}/"
         remote_src: yes
-
-    - name: Move wp-content to EFS
-      command: "mv {{ efs_mount_point }}/wordpress/wp-content {{ efs_mount_point }}/"
-
-    - name: Create symlink for wp-content
-      file:
-        src: "{{ efs_mount_point }}/wp-content"
-        dest: "{{ efs_mount_point }}/wordpress/wp-content"
-        state: link
+        creates: "{{ efs_mount_point }}/wordpress"
 
     - name: Configure WordPress
       template:
