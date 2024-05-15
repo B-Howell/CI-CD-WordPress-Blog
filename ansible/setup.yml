@@ -12,6 +12,11 @@
     ec2_instance_az: "{{ lookup('env', 'EC2_INSTANCE_AZ') }}"
     efs_mount_point: /mnt/efs  # Define the mount point for the EFS
   tasks:
+    - name: Update all packages to the latest version
+      yum:
+        name: '*'
+        state: latest
+
     - name: Install Amazon EFS Utilities
       yum:
         name: amazon-efs-utils
@@ -100,9 +105,3 @@
       template:
         src: templates/wp-config.php.j2
         dest: "{{ efs_mount_point }}/wordpress/wp-config.php"
-
-    - name: Ensure MySQL is running and enabled
-      service:
-        name: mysqld
-        state: started
-        enabled: yes
