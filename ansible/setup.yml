@@ -45,3 +45,25 @@
         name: httpd
         state: started
         enabled: yes
+
+    - name: Install PHP and extensions
+      yum:
+        name: 
+          - php
+          - php-xml
+        state: present
+
+    - name: Create phpinfo.php for verification
+      copy:
+        content: "<?php phpinfo(); ?>"
+        dest: /var/www/html/phpinfo.php
+
+    - name: Restart Apache to load PHP
+      service:
+        name: httpd
+        state: restarted
+
+    - name: Install MySQL client
+      yum:
+        name: mysql
+        state: present
