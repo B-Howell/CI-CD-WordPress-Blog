@@ -87,7 +87,22 @@
         dest: "{{ efs_mount_point }}/"
         remote_src: yes
 
+    - name: Move wp-content to EFS
+      command: "mv {{ efs_mount_point }}/wordpress/wp-content {{ efs_mount_point }}/"
+
+    - name: Create symlink for wp-content
+      file:
+        src: "{{ efs_mount_point }}/wp-content"
+        dest: "{{ efs_mount_point }}/wordpress/wp-content"
+        state: link
+
     - name: Configure WordPress
       template:
         src: templates/wp-config.php.j2
         dest: "{{ efs_mount_point }}/wordpress/wp-config.php"
+
+    - name: Ensure MySQL is running and enabled
+      service:
+        name: mysqld
+        state: started
+        enabled: yes
