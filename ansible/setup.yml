@@ -3,7 +3,7 @@
   become: yes
   vars:
     db_name: "{{ lookup('env', 'DB_NAME') }}"
-    db_user: "{{ lookup('env', 'DB_USER') }}"
+    db_username: "{{ lookup('env', 'DB_USERNAME') }}"
     db_password: "{{ lookup('env', 'DB_PASSWORD') }}"
     ec2_instance_ip: "{{ lookup('env', 'EC2_INSTANCE_IP') }}"
     rds_endpoint: "{{ lookup('env', 'RDS_ENDPOINT') }}"

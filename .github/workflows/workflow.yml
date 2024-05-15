@@ -88,9 +88,9 @@ jobs:
           ANSIBLE_HOST_KEY_CHECKING: False
           EC2_INSTANCE_IP: ${{ env.EC2_INSTANCE_IP }}
           EC2_INSTANCE_AZ: ${{ env.EC2_INSTANCE_AZ }}
-          DB_NAME: ${{ env.DB_NAME }}
-          DB_USER: ${{ env.DB_USER }}
-          DB_PASSWORD: ${{ env.DB_PASSWORD }}
+          DB_NAME: ${{ secrets.DB_NAME }}
+          DB_USERNAME: ${{ secrets.DB_USERNAME }}
+          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
           RDS_ENDPOINT: ${{ env.RDS_ENDPOINT }}
           EFS_ID: ${{ env.EFS_ID }}
           AWS_REGION: ${{ env.AWS_REGION }}
