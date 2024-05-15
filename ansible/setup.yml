@@ -68,9 +68,18 @@
         name: httpd
         state: restarted
 
+    - name: Add the MySQL repository
+      yum_repository:
+        name: mysql57-community
+        description: MySQL 5.7 Community Server
+        baseurl: http://repo.mysql.com/yum/mysql-5.7-community/el/7/x86_64/
+        gpgcheck: yes
+        gpgkey: http://repo.mysql.com/RPM-GPG-KEY-mysql
+        enabled: yes
+
     - name: Install MySQL client
       yum:
-        name: mysql
+        name: mysql-community-client
         state: present
 
     - name: Download WordPress
