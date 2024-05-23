@@ -7,15 +7,14 @@ This project automates the deployment of a WordPress site using a CI/CD pipeline
 - [Project Overview](#project-overview)
 - [Prerequisites](#prerequisites)
 - [Architecture](#architecture)
+  - [Terraform](#terraform)
+  - [Ansible](#Ansible)
+  - [GitHub Actions](@githubactions)
 - [Setup](#setup)
   - [Clone the Repository](#clone-the-repository)
   - [Configure AWS](#configure-aws)
   - [Set Up GitHub Secrets](#set-up-github-secrets)
   - [Run the Pipeline](#run-the-pipeline)
-- [Components](#components)
-  - [Terraform](#terraform)
-  - [Ansible](#ansible)
-  - [GitHub Actions](#github-actions)
 - [Verification](#verification)
 - [Troubleshooting](#troubleshooting)
 - [Contributing](#contributing)
@@ -29,28 +28,21 @@ This project aims to automate the end-to-end deployment of a WordPress site. It 
 - **Configuration Management**: Using Ansible to configure WordPress.
 - **Continuous Integration/Continuous Deployment (CI/CD)**: Using GitHub Actions to automate the workflow.
 
-## Prerequisites
+### Terraform
 
-Before you begin, ensure you have the following:
+Terraform will create the architecture in AWS that is needed for Wordpress to run. This includes a VPC with public and private subnets, security groups, Application Load Balancer, EC2 Instance, Elastic File Share, and Relational Database Service. Visit the 'terraform' directory and view main.tf for more details.
 
-- AWS account with IAM permissions to create resources.
-- Terraform installed on your local machine (if you'd like to test locally).
-- Ansible installed on your local machine (if you'd like to test locally).
-- GitHub account.
-- SSH key pair for accessing EC2 instances.
+![Architecture Diagram](img/architecture.jpg)
 
-## Architecture
+### Ansible
 
-The architecture consists of the following components:
+Ansible is the tool we will use for configuration management. It is essentially what will connect to our EC2 instance and install Wordpress. You can view setup.yml in the 'ansible' directory to see the playbook.
 
-- **AWS Infrastructure**: VPC, Subnets, Internet Gateway, Route Tables, Security Groups, EC2 instances, RDS (MySQL), EFS, and ALB.
-- **WordPress**: Installed and configured on EC2 instances using Ansible.
-- **CI/CD Pipeline**: GitHub Actions workflow to automate Terraform and Ansible execution.
+- Installing Apache, PHP, and necessary extensions.
+- Downloading and configuring WordPress.
+- Setting up EFS for shared storage.
+- Connecting to RDS for the database.
 
-## Setup
+### GitHub Actions
 
-### Clone the Repository
-
-```sh
-git clone https://github.com/yourusername/your-repo-name.git
-cd your-repo-name
+GitHub Actions is used as the CI/CD pipeline tool. It is what logs into AWS and then runs our Terraform and Ansible configurations automatically upon pushing the code into your own repo. You can view the 'workflow.yml' file in .github/workflows to see it in detail. There is also a 'destroy.yml' file you can run manually in case you want to destroy your infrastructure.
