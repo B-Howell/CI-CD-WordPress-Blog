@@ -8,7 +8,7 @@ This project automates the deployment of a WordPress site using a CI/CD pipeline
 - [Architecture](#architecture)
   - [Terraform](#terraform)
   - [Ansible](#Ansible)
-  - [GitHub Actions](@githubactions)
+  - [GitHub Actions](#github-actions)
 - [Setup](#setup)
   - [Prerequisites](#prerequisites)
   - [Clone the Repository](#clone-the-repository)
@@ -57,6 +57,8 @@ Before you begin, ensure you have the following:
 - [OIDC Setup](https://docs.github.com/en/actions/deployment/security-hardening-your-deployments/configuring-openid-connect-in-amazon-web-services) so GitHub Actions can configure AWS
 - SSH key pair for accessing EC2 instances.
 
+**PLEASE NOTE:** Following this repo will make Wordpress accessible via the DNS name of the Application Load Balancer. This project **DOES NOT** setup a custom domain name for your Wordpress website 
+
 ### Clone the Repository
 
 ```sh
@@ -98,4 +100,4 @@ Contributions are welcome! Please open an issue or submit a pull request for any
 
 ## License
 
-This project is licensed under the MIT License. See the LICENSE file for details.
+This project is licensed under the MIT License. See the MIT-LICENSE file for details.
